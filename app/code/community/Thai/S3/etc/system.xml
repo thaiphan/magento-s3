@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <thai_extensions>
+            <label>Thai's Extensions</label>
+            <sort_order>4000000</sort_order>
+        </thai_extensions>
+    </tabs>
+    <sections>
+        <thai_s3>
+            <class>separator-top</class>
+            <label>S3</label>
+            <tab>thai_extensions</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>300</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <general>
+                    <label>General</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <access_key>
+                            <label>Access Key</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>10</sort_order>
+                        </access_key>
+                        <secret_key>
+                            <label>Secret Key</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>20</sort_order>
+                        </secret_key>
+                        <bucket>
+                            <label>Bucket</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>30</sort_order>
+                        </bucket>
+                        <region>
+                            <label>Region</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>thai_s3/adminhtml_system_config_source_s3_region</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>40</sort_order>
+                        </region>
+                    </fields>
+                </general>
+            </groups>
+        </thai_s3>
+    </sections>
+</config>

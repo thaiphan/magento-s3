@@ -1,0 +1,15 @@
+{
+  "name": "thaiphan/magento-s3",
+  "description": "Use Amazon S3 as the file storage backend for your Magento store.",
+  "type": "magento-module",
+  "license": "MIT",
+  "keywords": [
+    "aws", "s3", "amazon", "magento"
+  ],
+  "authors": [
+    {
+      "name": "Thai Phan",
+      "email": "thai@outlook.com"
+    }
+  ]
+}
