@@ -36,6 +36,11 @@
                     <zend>Thai_S3_Model_Captcha_Zend</zend>
                 </rewrite>
             </captcha>
+            <dataflow>
+                <rewrite>
+                    <profile>Thai_S3_Model_Dataflow_Profile</profile>
+                </rewrite>
+            </dataflow>
         </models>
         <helpers>
             <thai_s3>
@@ -43,6 +48,7 @@
             </thai_s3>
             <core>
                 <rewrite>
+                    <file_storage>Thai_S3_Helper_Core_File_Storage</file_storage>
                     <file_storage_database>Thai_S3_Helper_Core_File_Storage_Database</file_storage_database>
                 </rewrite>
             </core>
