@@ -1,6 +1,10 @@
 Thai's S3 Extension for Magento
 ===============================
 
+[![Total Downloads](https://img.shields.io/packagist/dt/thaiphan/magento-s3.svg?style=flat)](https://packagist.org/packages/thaiphan/magento-s3)
+[![MIT License](https://img.shields.io/packagist/l/thaiphan/magento-s3.svg?style=flat)](https://packagist.org/packages/thaiphan/magento-s3)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/thaiphan)
+
 Thai's S3 extension for Magento allows retailers to upload their catalogue and WYSIWYG media assets (such as images and videos) straight to Amazon S3.
 
 Benefits
