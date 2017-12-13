@@ -7,6 +7,8 @@ Thai's S3 Extension for Magento
 
 Thai's S3 extension for Magento allows retailers to upload their catalogue and WYSIWYG media assets (such as images and videos) straight to Amazon S3.
 
+**Note:** This extension is only compatible with Magento 1. Please use [Thai's S3 Extension for Magento 2](https://github.com/thaiphan/magento2-s3) for integration with Magento 2.
+
 Benefits
 --------
 
@@ -52,6 +54,12 @@ FAQs
 ### Does this extension upload my log files?
 
 No, the S3 extension only syncs across the media folder. You will need to find an alternative solution to store your log files.
+
+### Magento is still loading images from the file system! What went wrong?
+
+The S3 extension is built on top of the built-in database file storage, which will re-download files back onto the file system as part of a caching mechanism. Magento will then use this cached version of the image instead of using S3.
+
+If you have enabled S3 integration then you can safely delete the images off your file system **(although please take a backup just in case)**. If you want Magento to not download files to the file system, you can configure your static media URL to point to S3 or CloudFront.
 
 ### We did something wrong and all our images are gone! Can you restore it?
 
