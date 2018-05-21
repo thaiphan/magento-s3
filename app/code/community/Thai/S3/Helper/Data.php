@@ -6,6 +6,7 @@ class Thai_S3_Helper_Data extends Mage_Core_Helper_Data
 
     /**
      * @return Zend_Service_Amazon_S3
+     * @throws Zend_Service_Amazon_S3_Exception
      */
     public function getClient()
     {
@@ -15,6 +16,9 @@ class Thai_S3_Helper_Data extends Mage_Core_Helper_Data
                 $this->getSecretKey(),
                 $this->getRegion()
             );
+            if ($this->getCustomEndpointEnabled()) {
+                $this->client->setEndpoint($this->getCustomEndpoint());
+            }
         }
         return $this->client;
     }
@@ -85,5 +89,21 @@ class Thai_S3_Helper_Data extends Mage_Core_Helper_Data
     public function getBucket()
     {
         return Mage::getStoreConfig('thai_s3/general/bucket');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCustomEndpointEnabled()
+    {
+        return (bool)Mage::getStoreConfig('thai_s3/general/custom_endpoint_enabled');
+    }
+
+    /**
+     * @return string
+     */
+    public function getCustomEndpoint()
+    {
+        return Mage::getStoreConfig('thai_s3/general/custom_endpoint');
     }
 }
