@@ -132,6 +132,7 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
      *
      * @param string $filename
      * @return $this
+     * @throws Zend_Service_Amazon_S3_Exception
      */
     public function saveFile($filename)
     {
@@ -205,7 +206,7 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
         $prefix = Mage::helper('core/file_storage_database')->getMediaRelativePath($path);
         $prefix = rtrim($prefix, '/') . '/';
 
-        $objectsAndPrefixes = $this->getHelper()->getClient()->getObjectsAndPrefixesByBucket($this->getBucket(), [
+        $objectsAndPrefixes = $this->getHelper()->getClient()->getObjectsAndPrefixesByBucket($this->getHelper()->getBucket(), [
             'prefix' => $prefix,
             'delimiter' => '/'
         ]);
@@ -228,7 +229,7 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
         $prefix = Mage::helper('core/file_storage_database')->getMediaRelativePath($directory);
         $prefix = rtrim($prefix, '/') . '/';
 
-        $objectsAndPrefixes = $this->getHelper()->getClient()->getObjectsAndPrefixesByBucket($this->getBucket(), [
+        $objectsAndPrefixes = $this->getHelper()->getClient()->getObjectsAndPrefixesByBucket($this->getHelper()->getBucket(), [
             'prefix' => $prefix,
             'delimiter' => '/'
         ]);
