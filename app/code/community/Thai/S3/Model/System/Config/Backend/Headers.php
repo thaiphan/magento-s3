@@ -6,6 +6,9 @@ class Thai_S3_Model_System_Config_Backend_Headers extends Mage_Core_Model_Config
 
     private $unserializeHelper = null;
 
+    /**
+     * @throws Exception
+     */
     protected function _afterLoad()
     {
         $value = $this->getValue();

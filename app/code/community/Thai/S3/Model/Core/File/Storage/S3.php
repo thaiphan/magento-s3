@@ -114,10 +114,7 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
             try {
                 $objectKey = $this->getHelper()->getObjectKey($file['filename'], $file['directory']);
                 $content = $file['content'];
-                $meta = [
-                    Zend_Service_Amazon_S3::S3_ACL_HEADER => Zend_Service_Amazon_S3::S3_ACL_PUBLIC_READ
-                ];
-                $this->getHelper()->getClient()->putObject($objectKey, $content, $meta);
+                $this->getHelper()->getClient()->putObject($objectKey, $content, $this->getMetadata($objectKey));
             } catch (Exception $e) {
                 $this->errors[] = $e->getMessage();
                 Mage::logException($e);
@@ -139,7 +136,7 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
         $sourcePath = $this->getMediaBaseDirectory() . '/' . $filename;
         $destinationPath = $this->getHelper()->getObjectKey($filename);
 
-        $this->getHelper()->getClient()->putFile($sourcePath, $destinationPath, $this->getMetadata());
+        $this->getHelper()->getClient()->putFile($sourcePath, $destinationPath, $this->getMetadata($sourcePath));
 
         return $this;
     }
@@ -148,13 +145,29 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
      * An array of the HTTP headers that we intend send to S3 alongside the
      * object.
      *
+     * @param string $filename
      * @return array
+     * @throws Exception
      */
-    public function getMetadata()
+    public function getMetadata($filename)
     {
-        return [
+        $mimeType = $this->getHelper()->getClient()->getMimeType($filename);
+
+        $meta = [
+            Zend_Service_Amazon_S3::S3_CONTENT_TYPE_HEADER => $mimeType,
             Zend_Service_Amazon_S3::S3_ACL_HEADER => Zend_Service_Amazon_S3::S3_ACL_PUBLIC_READ
         ];
+
+        $headers = Mage::getStoreConfig('thai_s3/general/custom_headers');
+        /** @var Mage_Core_Helper_UnserializeArray $unserializeHelper */
+        $unserializeHelper = Mage::helper('core/unserializeArray');
+        $headers = $unserializeHelper->unserialize($headers);
+
+        foreach ($headers as $header => $value) {
+            $meta[$header] = $value;
+        }
+
+        return $meta;
     }
 
     /**
@@ -173,13 +186,7 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
         $oldFilePath = $this->getHelper()->getObjectKey($oldFilePath);
         $newFilePath = $this->getHelper()->getObjectKey($newFilePath);
 
-        $mimeType = $this->getHelper()->getClient()->getMimeType($oldFilePath);
-        $meta = [
-            Zend_Service_Amazon_S3::S3_CONTENT_TYPE_HEADER => $mimeType,
-            Zend_Service_Amazon_S3::S3_ACL_HEADER => Zend_Service_Amazon_S3::S3_ACL_PUBLIC_READ
-        ];
-
-        $this->getHelper()->getClient()->copyObject($oldFilePath, $newFilePath, $meta);
+        $this->getHelper()->getClient()->copyObject($oldFilePath, $newFilePath, $this->getMetadata($oldFilePath));
 
         return $this;
     }
@@ -189,12 +196,7 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
         $oldName = $this->getHelper()->getObjectKey($oldName);
         $newName = $this->getHelper()->getObjectKey($newName);
 
-        $mimeType = $this->getHelper()->getClient()->getMimeType($oldName);
-        $meta = [
-            Zend_Service_Amazon_S3::S3_CONTENT_TYPE_HEADER => $mimeType,
-            Zend_Service_Amazon_S3::S3_ACL_HEADER => Zend_Service_Amazon_S3::S3_ACL_PUBLIC_READ
-        ];
-        $this->getHelper()->getClient()->moveObject($oldName, $newName, $meta);
+        $this->getHelper()->getClient()->moveObject($oldName, $newName, $this->getMetadata($oldName));
 
         return $this;
     }
