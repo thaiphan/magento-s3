@@ -6,6 +6,11 @@
         </Thai_S3>
     </modules>
     <global>
+        <blocks>
+            <thai_s3>
+                <class>Thai_S3_Block</class>
+            </thai_s3>
+        </blocks>
         <models>
             <thai_s3>
                 <class>Thai_S3_Model</class>

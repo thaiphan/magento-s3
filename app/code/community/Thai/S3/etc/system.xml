@@ -79,6 +79,15 @@
                             <sort_order>60</sort_order>
                             <comment>Don't include the http:// or https:// prefix.</comment>
                         </custom_endpoint>
+                        <custom_headers>
+                            <label>Custom Headers</label>
+                            <frontend_model>thai_s3/adminhtml_form_field_headers</frontend_model>
+                            <backend_model>thai_s3/system_config_backend_headers</backend_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>70</sort_order>
+                        </custom_headers>
                     </fields>
                 </general>
             </groups>
