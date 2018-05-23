@@ -12,9 +12,11 @@ class Thai_S3_Model_System_Config_Backend_Headers extends Mage_Core_Model_Config
     protected function _afterLoad()
     {
         $value = $this->getValue();
-        $value = $this->getUnserializeHelper()->unserialize($value);
-        $value = $this->_encodeArrayFieldValue($value);
-        $this->setValue($value);
+        if ($value) {
+            $value = $this->getUnserializeHelper()->unserialize($value);
+            $value = $this->_encodeArrayFieldValue($value);
+            $this->setValue($value);
+        }
     }
 
     protected function _beforeSave()
