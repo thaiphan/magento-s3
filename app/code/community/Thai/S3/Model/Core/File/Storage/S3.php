@@ -159,12 +159,14 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
         ];
 
         $headers = Mage::getStoreConfig('thai_s3/general/custom_headers');
-        /** @var Mage_Core_Helper_UnserializeArray $unserializeHelper */
-        $unserializeHelper = Mage::helper('core/unserializeArray');
-        $headers = $unserializeHelper->unserialize($headers);
+        if ($headers) {
+            /** @var Mage_Core_Helper_UnserializeArray $unserializeHelper */
+            $unserializeHelper = Mage::helper('core/unserializeArray');
+            $headers = $unserializeHelper->unserialize($headers);
 
-        foreach ($headers as $header => $value) {
-            $meta[$header] = $value;
+            foreach ($headers as $header => $value) {
+                $meta[$header] = $value;
+            }
         }
 
         return $meta;
