@@ -54,14 +54,15 @@ class Thai_S3_Shell_Export extends Mage_Shell_Abstract
         $destinationModel = $helper->getStorageModel(Thai_S3_Model_Core_File_Storage::STORAGE_MEDIA_S3);
 
         $offset = 0;
-        while (($files = $sourceModel->exportFiles($offset, 1)) !== false) {
+        $count = 1;
+        while (($files = $sourceModel->exportFiles($offset, $count)) !== false) {
             foreach ($files as $file) {
                 echo sprintf("Uploading %s to S3.\n", $file['directory'] . '/' . $file['filename']);
             }
             if (!$this->getArg('dry-run')) {
                 $destinationModel->importFiles($files);
             }
-            $offset += count($files);
+            $offset += $count;
         }
         unset($files);
 
