@@ -5,7 +5,7 @@ class Thai_S3_Shell_Config extends Mage_Shell_Abstract
 {
     protected function _validate()
     {
-        if (!empty($this->getArg('h')) && !empty($this->getArg('help')) && !empty($this->getArg('list'))) {
+        if (empty($this->getArg('h')) && empty($this->getArg('help')) && empty($this->getArg('list'))) {
             $errors = [];
             if ($this->getArg('region')) {
                 /** @var Thai_S3_Helper_S3 $helper */
