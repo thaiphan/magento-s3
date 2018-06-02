@@ -31,6 +31,10 @@ class Thai_S3_Helper_Data extends Mage_Core_Helper_Data
      */
     public function getObjectKey($filePath)
     {
+        $prefix = $this->getPrefix();
+        if ($prefix) {
+            $filePath = ltrim($prefix, '/') . '/' . $filePath;
+        }
         return $this->getBucket() . '/' . $filePath;
     }
 
@@ -72,6 +76,16 @@ class Thai_S3_Helper_Data extends Mage_Core_Helper_Data
     public function getBucket()
     {
         return Mage::getStoreConfig('thai_s3/general/bucket');
+    }
+
+    /**
+     * Returns the string that we want to prepend to all of our S3 object keys.
+     *
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return Mage::getStoreConfig('thai_s3/general/prefix');
     }
 
     /**

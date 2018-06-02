@@ -59,6 +59,14 @@
                             <sort_order>40</sort_order>
                             <comment>This extension only supports regions that support the Signature Version 2 signing process.</comment>
                         </region>
+                        <prefix>
+                            <label>Prefix</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>50</sort_order>
+                        </prefix>
                         <custom_endpoint_enabled>
                             <label>Enable Custom Endpoint</label>
                             <frontend_type>select</frontend_type>
@@ -66,7 +74,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <sort_order>50</sort_order>
+                            <sort_order>60</sort_order>
                             <comment>Turn this on if you want to use a custom S3-compatible endpoint instead, e.g. DreamHost or Digital Ocean.</comment>
                         </custom_endpoint_enabled>
                         <custom_endpoint>
@@ -76,7 +84,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <sort_order>60</sort_order>
+                            <sort_order>70</sort_order>
                             <comment>Don't include the http:// or https:// prefix.</comment>
                         </custom_endpoint>
                         <custom_headers>
@@ -86,7 +94,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <sort_order>70</sort_order>
+                            <sort_order>80</sort_order>
                         </custom_headers>
                     </fields>
                 </general>
