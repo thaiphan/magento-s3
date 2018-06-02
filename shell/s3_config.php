@@ -25,6 +25,7 @@ class Thai_S3_Shell_Config extends Mage_Shell_Abstract
                 echo "    --secret-key <secret-key>      a valid AWS secret access key\n";
                 echo "    --bucket <bucket>              an S3 bucket name\n";
                 echo "    --region <region>              an S3 region, e.g. us-east-1\n";
+                echo "    --prefix <prefix>              a prefix to prepend to all your files\n";
                 echo "    -h, --help\n\n";
                 die();
             }
@@ -53,6 +54,10 @@ class Thai_S3_Shell_Config extends Mage_Shell_Abstract
                 Mage::getConfig()->saveConfig('thai_s3/general/region', $this->getArg('region'));
                 $updatedCredentials = true;
             }
+            if (!empty($this->getArg('prefix'))) {
+                Mage::getConfig()->saveConfig('thai_s3/general/prefix', $this->getArg('prefix'));
+                $updatedCredentials = true;
+            }
 
             if ($updatedCredentials) {
                 echo "You have successfully updated your S3 credentials.\n";
@@ -66,7 +71,7 @@ class Thai_S3_Shell_Config extends Mage_Shell_Abstract
             /** @var Thai_S3_Helper_Data $helper */
             $helper = Mage::helper('thai_s3');
             echo 'Here are your AWS credentials.';
-            if ($this->getArg('access-key-id') || $this->getArg('secret-key') || $this->getArg('bucket') || $this->getArg('region')) {
+            if ($this->getArg('access-key-id') || $this->getArg('secret-key') || $this->getArg('bucket') || $this->getArg('region') || $this->getArg('prefix')) {
                 echo " \033[1mNo configuration setting was updated.\033[0m";
             }
             echo "\n\n";
@@ -75,6 +80,7 @@ class Thai_S3_Shell_Config extends Mage_Shell_Abstract
             echo sprintf("Secret Access Key: %s\n", $helper->getSecretKey());
             echo sprintf("Bucket:            %s\n", $helper->getBucket());
             echo sprintf("Region:            %s\n", $helper->getRegion());
+            echo sprintf("Prefix:            %s\n", $helper->getPrefix());
         }
 
         return $this;
@@ -97,6 +103,7 @@ class Thai_S3_Shell_Config extends Mage_Shell_Abstract
                       [--secret-key <secret-key>]
                       [--bucket <bucket>]
                       [--region <region>]
+                      [--prefix <prefix>]
                       [-h] [--help]
 
 \033[1mOPTIONS\033[0m
@@ -134,6 +141,10 @@ class Thai_S3_Shell_Config extends Mage_Shell_Abstract
 
         You can review all valid S3 regions via the AWS documentation
         (http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region).
+
+    --prefix <prefix>
+        You can optionally provide a prefix that you want to preprend to all of
+        your objects prior to uploading to S3.
 
 
 USAGE;
