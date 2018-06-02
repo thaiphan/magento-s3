@@ -112,7 +112,8 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
     {
         foreach ($files as $file) {
             try {
-                $objectKey = $this->getHelper()->getObjectKey($file['filename'], $file['directory']);
+                $filePath = $this->getFilePath($file['filename'], $file['directory']);
+                $objectKey = $this->getHelper()->getObjectKey($filePath);
                 $content = $file['content'];
                 $this->getHelper()->getClient()->putObject($objectKey, $content, $this->getMetadata($objectKey));
             } catch (Exception $e) {
@@ -122,6 +123,21 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
         }
 
         return $this;
+    }
+
+    /**
+     * Get the file path of the file.
+     *
+     * @param string $filePath
+     * @param string $prefix
+     * @return string
+     */
+    private function getFilePath($filePath, $prefix = null)
+    {
+        if (!is_null($prefix)) {
+            $filePath = $prefix . '/' . $filePath;
+        }
+        return $filePath;
     }
 
     /**

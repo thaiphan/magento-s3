@@ -27,28 +27,11 @@ class Thai_S3_Helper_Data extends Mage_Core_Helper_Data
      * Get the key used to reference the file in S3.
      *
      * @param string $filePath
-     * @param string $prefix
      * @return string
      */
-    public function getObjectKey($filePath, $prefix = null)
+    public function getObjectKey($filePath)
     {
-        $filePath = $this->getFilePath($filePath, $prefix);
         return $this->getBucket() . '/' . $filePath;
-    }
-
-    /**
-     * Get the file path of the file.
-     *
-     * @param string $filePath
-     * @param string $prefix
-     * @return string
-     */
-    public function getFilePath($filePath, $prefix = null)
-    {
-        if (!is_null($prefix)) {
-            $filePath = $prefix . '/' . $filePath;
-        }
-        return $filePath;
     }
 
     /**
