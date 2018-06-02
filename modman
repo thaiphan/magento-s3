@@ -1,3 +1,4 @@
 app/code/community/Thai/* app/code/community/Thai/
 app/etc/modules/*         app/etc/modules/
+lib/Thai/*                lib/Thai/
 shell/*                   shell/

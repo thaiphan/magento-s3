@@ -5,13 +5,13 @@ class Thai_S3_Helper_Data extends Mage_Core_Helper_Data
     private $client = null;
 
     /**
-     * @return Zend_Service_Amazon_S3
+     * @return Thai_Service_Amazon_S3
      * @throws Zend_Service_Amazon_S3_Exception
      */
     public function getClient()
     {
         if (is_null($this->client)) {
-            $this->client = new Zend_Service_Amazon_S3(
+            $this->client = new Thai_Service_Amazon_S3(
                 $this->getAccessKey(),
                 $this->getSecretKey(),
                 $this->getRegion()
