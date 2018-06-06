@@ -33,7 +33,7 @@ class Thai_S3_Helper_Data extends Mage_Core_Helper_Data
     {
         $prefix = $this->getPrefix();
         if ($prefix) {
-            $filePath = ltrim($prefix, '/') . '/' . $filePath;
+            $filePath = trim($prefix, '/') . '/' . $filePath;
         }
         return $this->getBucket() . '/' . $filePath;
     }
