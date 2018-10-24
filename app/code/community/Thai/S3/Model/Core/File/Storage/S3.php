@@ -70,7 +70,10 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
 
     public function clear()
     {
-        $result = $this->getClient()->listObjects(['Bucket' => $this->bucket]);
+        $result = $this->getClient()->listObjects([
+            'Bucket' => $this->bucket,
+            'Prefix' => $this->getObjectKey(''),
+        ]);
 
         while ( ! empty($result['Contents'])) {
             foreach ($result['Contents'] as $object) {
