@@ -228,7 +228,10 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
     public function fileExists($filePath)
     {
         try {
-            $this->getClient()->headObject(['Bucket' => $this->bucket, $this->getObjectKey($filePath)]);
+            $this->getClient()->headObject([
+                'Bucket' => $this->bucket,
+                'Key' => $this->getObjectKey($filePath)
+            ]);
             return TRUE;
         } catch (S3Exception $e) {
             return FALSE;
