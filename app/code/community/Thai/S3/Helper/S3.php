@@ -25,6 +25,10 @@ class Thai_S3_Helper_S3
     {
         return [
             [
+                'value' => '_custom_',
+                'label' => 'Custom Region (use with Custom Endpoint)',
+            ],
+            [
                 'value' => 'us-east-1',
                 'label' => 'US East (N. Virginia)'
             ],

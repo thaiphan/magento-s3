@@ -1,14 +1,17 @@
 <?php
 
+use Aws\Exception\AwsException;
+use Aws\S3\Exception\S3Exception;
+
 class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Abstract
 {
     protected $_eventPrefix = 'thai_s3_core_file_storage_s3';
 
-    private $helper = null;
-
+    protected $bucket;
+    
     private $errors = [];
 
-    private $objects = [];
+    private $exportMarker;
 
     protected function _construct()
     {
@@ -22,6 +25,8 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
 
     public function init()
     {
+        $this->bucket = $this->getHelper()->getBucket();
+        
         return $this;
     }
 
@@ -33,14 +38,22 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
         return Mage::helper('thai_s3')->__('S3');
     }
 
+    /**
+     * @param string $filePath
+     * @return $this
+     */
     public function loadByFilename($filePath)
     {
-        $object = $this->getHelper()->getClient()->getObject($this->getHelper()->getObjectKey($filePath));
-        if ($object) {
+        try {
+            $result = $this->getClient()->getObject([
+                'Bucket' => $this->bucket,
+                'Key' => $this->getObjectKey($filePath)
+            ]);
             $this->setData('id', $filePath);
             $this->setData('filename', $filePath);
-            $this->setData('content', $object);
-        } else {
+            $this->setData('content', $result['Body']);
+        } catch (AwsException $e) {
+            Mage::logException($e);
             $this->unsetData();
         }
 
@@ -57,7 +70,19 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
 
     public function clear()
     {
-        $this->getHelper()->getClient()->cleanBucket($this->getHelper()->getBucket());
+        $result = $this->getClient()->listObjects(['Bucket' => $this->bucket]);
+
+        while ( ! empty($result['Contents'])) {
+            foreach ($result['Contents'] as $object) {
+                $this->getClient()->deleteObject(['Bucket' => $this->bucket, 'Key' => $object['Key']]);
+            }
+            if ($result['IsTruncated']) {
+                $result = $this->getClient()->listObjects(['Bucket' => $this->bucket, 'Marker' => $result['NextMarker']]);
+            } else {
+                break;
+            }
+        }
+
         return $this;
     }
 
@@ -73,30 +98,26 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
 
     public function exportFiles($offset = 0, $count = 100)
     {
+        if ($offset == 0) {
+            $this->exportMarker = NULL;
+        }
+        $result = $this->getClient()->listObjects([
+            'Bucket' => $this->bucket,
+            'MaxKeys' => min($count, 1000),
+            'Marker' => $this->exportMarker
+        ]);
+
+        if ($result['IsTruncated']) {
+            $this->exportMarker = $result['NextMarker'];
+        }
+
         $files = [];
-
-        if (empty($this->objects)) {
-            $this->objects = $this->getHelper()->getClient()->getObjectsByBucket($this->getHelper()->getBucket(), [
-                'max-keys' => $count
-            ]);
-        } else {
-            $this->objects = $this->getHelper()->getClient()->getObjectsByBucket($this->getHelper()->getBucket(), [
-                'marker' => $this->objects[count($this->objects) - 1],
-                'max-keys' => $count
-            ]);
-        }
-
-        if (empty($this->objects)) {
-            return false;
-        }
-
-        foreach ($this->objects as $object) {
-            if (substr($object, -1) != '/') {
-                $files[] = [
-                    'filename' => $object,
-                    'content' => $this->getHelper()->getClient()->getObject($this->getHelper()->getObjectKey($object))
-                ];
-            }
+        foreach ($result['Contents'] as $object) {
+            $_result = $this->getClient()->getObject(['Bucket' => $this->bucket, 'Key' => $object['Key']]);
+            $files[] = [
+                'filename' => $this->getLocalPath($object['Key']),
+                'content' => $_result['Body'],
+            ];
         }
 
         return $files;
@@ -113,9 +134,11 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
         foreach ($files as $file) {
             try {
                 $filePath = $this->getFilePath($file['filename'], $file['directory']);
-                $objectKey = $this->getHelper()->getObjectKey($filePath);
-                $content = $file['content'];
-                $this->getHelper()->getClient()->putObject($objectKey, $content, $this->getMetadata($objectKey));
+                $this->getClient()->putObject([
+                    'Bucket' => $this->bucket,
+                    'Key' => $this->getObjectKey($filePath),
+                    'Body' => $file['content'],
+                ] + $this->getMetadata($filePath));
             } catch (Exception $e) {
                 $this->errors[] = $e->getMessage();
                 Mage::logException($e);
@@ -145,14 +168,18 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
      *
      * @param string $filename
      * @return $this
-     * @throws Zend_Service_Amazon_S3_Exception
+     * @throws AwsException
+     * @throws Exception
      */
     public function saveFile($filename)
     {
         $sourcePath = $this->getMediaBaseDirectory() . '/' . $filename;
-        $destinationPath = $this->getHelper()->getObjectKey($filename);
 
-        $this->getHelper()->getClient()->putFile($sourcePath, $destinationPath, $this->getMetadata($sourcePath));
+        $this->getClient()->putObject([
+                'Bucket' => $this->bucket,
+                'Key' => $this->getObjectKey($filename),
+                'SourceFile' => $sourcePath,
+            ] + $this->getMetadata($sourcePath));
 
         return $this;
     }
@@ -167,11 +194,11 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
      */
     public function getMetadata($filename)
     {
-        $mimeType = $this->getHelper()->getClient()->getMimeType($filename);
+        //$mimeType = $this->getClient()->getMimeType($filename);
 
         $meta = [
-            Zend_Service_Amazon_S3::S3_CONTENT_TYPE_HEADER => $mimeType,
-            Zend_Service_Amazon_S3::S3_ACL_HEADER => Zend_Service_Amazon_S3::S3_ACL_PUBLIC_READ
+            //'ContentType' => $mimeType,
+            'ACL' => 'public-read',
         ];
 
         $headers = Mage::getStoreConfig('thai_s3/general/custom_headers');
@@ -181,6 +208,7 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
             $headers = $unserializeHelper->unserialize($headers);
 
             foreach ($headers as $header => $value) {
+                // TODO - support Metadata?
                 $meta[$header] = $value;
             }
         }
@@ -196,47 +224,47 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
      */
     public function fileExists($filePath)
     {
-        return $this->getHelper()->getClient()->isObjectAvailable($this->getHelper()->getObjectKey($filePath));
+        try {
+            $this->getClient()->headObject(['Bucket' => $this->bucket, $this->getObjectKey($filePath)]);
+            return TRUE;
+        } catch (S3Exception $e) {
+            return FALSE;
+        }
     }
 
     public function copyFile($oldFilePath, $newFilePath)
     {
-        $oldFilePath = $this->getHelper()->getObjectKey($oldFilePath);
-        $newFilePath = $this->getHelper()->getObjectKey($newFilePath);
-
-        $this->getHelper()->getClient()->copyObject($oldFilePath, $newFilePath, $this->getMetadata($oldFilePath));
+        $this->getClient()->copyObject([
+            'Bucket' => $this->bucket,
+            'CopySource' => $this->getObjectKey($oldFilePath),
+            'Key' => $this->getObjectKey($newFilePath),
+        ] + $this->getMetadata($oldFilePath));
 
         return $this;
     }
 
     public function renameFile($oldName, $newName)
     {
-        $oldName = $this->getHelper()->getObjectKey($oldName);
-        $newName = $this->getHelper()->getObjectKey($newName);
-
-        $this->getHelper()->getClient()->moveObject($oldName, $newName, $this->getMetadata($oldName));
+        $this->copyFile($oldName, $newName);
+        $this->deleteFile($oldName);
 
         return $this;
     }
 
     public function getSubdirectories($path)
     {
-        $subdirectories = [];
-
         $prefix = Mage::helper('core/file_storage_database')->getMediaRelativePath($path);
         $prefix = rtrim($prefix, '/') . '/';
 
-        $objectsAndPrefixes = $this->getHelper()->getClient()->getObjectsAndPrefixesByBucket($this->getHelper()->getBucket(), [
-            'prefix' => $prefix,
-            'delimiter' => '/'
+        $results = $this->getClient()->getPaginator('ListObjects', [
+            'Bucket' => $this->bucket,
+            'Prefix' => $this->getObjectKey($prefix),
+            'Delimiter' => '/'
         ]);
 
-        if (isset($objectsAndPrefixes['prefixes'])) {
-            foreach ($objectsAndPrefixes['prefixes'] as $subdirectory) {
-                $subdirectories[] = [
-                    'name' => substr($subdirectory, strlen($prefix))
-                ];
-            }
+        $subdirectories = [];
+        foreach ($results->search('CommonPrefixes[].Prefix') as $item) {
+            $subdirectories[] = ['name' => $item];
         }
 
         return $subdirectories;
@@ -244,25 +272,22 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
 
     public function getDirectoryFiles($directory)
     {
-        $files = [];
-
         $prefix = Mage::helper('core/file_storage_database')->getMediaRelativePath($directory);
         $prefix = rtrim($prefix, '/') . '/';
 
-        $objectsAndPrefixes = $this->getHelper()->getClient()->getObjectsAndPrefixesByBucket($this->getHelper()->getBucket(), [
-            'prefix' => $prefix,
-            'delimiter' => '/'
+        $results = $this->getClient()->getPaginator('ListObjects', [
+            'Bucket' => $this->bucket,
+            'Prefix' => $this->getObjectKey($prefix),
+            'Delimiter' => '/'
         ]);
 
-        if (isset($objectsAndPrefixes['objects'])) {
-            foreach ($objectsAndPrefixes['objects'] as $object) {
-                if ($object != $prefix) {
-                    $files[] = [
-                        'filename' => $object,
-                        'content' => $this->getHelper()->getClient()->getObject($this->getHelper()->getObjectKey($object))
-                    ];
-                }
-            }
+        $files = [];
+        foreach ($results->search('Contents[].Key') as $key) {
+            $_result = $this->getClient()->getObject(['Bucket' => $this->bucket, 'Key' => $key]);
+            $files[] = [
+                'filename' => $this->getLocalPath($key),
+                'content' => $_result['Body'],
+            ];
         }
 
         return $files;
@@ -270,9 +295,7 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
 
     public function deleteFile($path)
     {
-        $path = $this->getHelper()->getObjectKey($path);
-
-        $this->getHelper()->getClient()->removeObject($path);
+        $this->getClient()->deleteObject(['Bucket' => $this->bucket, 'Key' => $this->getObjectKey($path)]);
 
         return $this;
     }
@@ -282,9 +305,21 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
      */
     protected function getHelper()
     {
-        if (is_null($this->helper)) {
-            $this->helper = Mage::helper('thai_s3');
-        }
-        return $this->helper;
+        return Mage::helper('thai_s3');
+    }
+    
+    protected function getClient()
+    {
+        return $this->getHelper()->getClient();
+    }
+    
+    protected function getObjectKey($file)
+    {
+        return $this->getHelper()->getObjectKey($file);
+    }
+
+    protected function getLocalPath($file)
+    {
+        return $this->getHelper()->getLocalPath($file);
     }
 }
