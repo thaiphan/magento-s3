@@ -41,8 +41,20 @@ class Thai_S3_Helper_S3
                 'label' => 'EU (Ireland)'
             ],
             [
+                'value' => 'eu-west-2',
+                'label' => 'EU (London)'
+            ],
+            [
+                'value' => 'eu-west-3',
+                'label' => 'EU (Paris)'
+            ],
+            [
                 'value' => 'eu-central-1',
                 'label' => 'EU (Frankfurt)'
+            ],
+            [
+                'value' => 'eu-north-1',
+                'label' => 'EU (Stockholm)'
             ],
             [
                 'value' => 'ap-southeast-1',
