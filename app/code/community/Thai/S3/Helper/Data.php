@@ -5,20 +5,20 @@ class Thai_S3_Helper_Data extends Mage_Core_Helper_Data
     private $client = null;
 
     /**
-     * @return Zend_Service_Amazon_S3
-     * @throws Zend_Service_Amazon_S3_Exception
+     * @return \Aws\S3\S3Client
      */
     public function getClient()
     {
         if (is_null($this->client)) {
-            $this->client = new Zend_Service_Amazon_S3(
-                $this->getAccessKey(),
-                $this->getSecretKey(),
-                $this->getRegion()
-            );
-            if ($this->getCustomEndpointEnabled()) {
-                $this->client->setEndpoint($this->getCustomEndpoint());
-            }
+            $this->client = new Aws\S3\S3Client([
+                'version' => 'latest',
+                'region' => $this->getRegion(),
+                'endpoint' => $this->getCustomEndpoint() ?: NULL,
+                'credentials' => [
+                    'key' => $this->getAccessKey(),
+                    'secret' => $this->getSecretKey(),
+                ],
+            ]);
         }
         return $this->client;
     }
@@ -35,7 +35,22 @@ class Thai_S3_Helper_Data extends Mage_Core_Helper_Data
         if ($prefix) {
             $filePath = ltrim($prefix, '/') . '/' . $filePath;
         }
-        return $this->getBucket() . '/' . $filePath;
+        return $filePath;
+    }
+
+    /**
+     * Get the local path for the remote key (strip prefix)
+     *
+     * @param string $remoteKey
+     * @return null|string|string[]
+     */
+    public function getLocalPath($remoteKey)
+    {
+        $prefix = $this->getPrefix();
+        if ($prefix) {
+            $remoteKey = preg_replace('/^'.preg_quote($prefix).'/', '', $remoteKey, 1);
+        }
+        return $remoteKey;
     }
 
     /**
@@ -65,7 +80,11 @@ class Thai_S3_Helper_Data extends Mage_Core_Helper_Data
      */
     public function getRegion()
     {
-        return Mage::getStoreConfig('thai_s3/general/region');
+        $region = Mage::getStoreConfig('thai_s3/general/region');
+        if ($region == '_custom_') {
+            return Mage::getStoreConfig('thai_s3/general/custom_region');
+        }
+        return $region;
     }
 
     /**
@@ -86,14 +105,6 @@ class Thai_S3_Helper_Data extends Mage_Core_Helper_Data
     public function getPrefix()
     {
         return Mage::getStoreConfig('thai_s3/general/prefix');
-    }
-
-    /**
-     * @return bool
-     */
-    public function getCustomEndpointEnabled()
-    {
-        return (bool)Mage::getStoreConfig('thai_s3/general/custom_endpoint_enabled');
     }
 
     /**

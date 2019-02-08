@@ -11,5 +11,8 @@
       "name": "Thai Phan",
       "email": "thai@outlook.com"
     }
-  ]
+  ],
+  "require": {
+    "aws/aws-sdk-php": "~3.0"
+  }
 }

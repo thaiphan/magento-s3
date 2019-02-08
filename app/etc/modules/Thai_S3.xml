@@ -4,11 +4,6 @@
         <Thai_S3>
             <active>true</active>
             <codePool>community</codePool>
-            <depends>
-                <Mage_Core />
-                <Mage_Adminhtml />
-                <Mage_Cms />
-            </depends>
         </Thai_S3>
     </modules>
 </config>
