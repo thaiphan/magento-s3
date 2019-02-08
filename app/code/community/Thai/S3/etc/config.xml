@@ -59,4 +59,13 @@
             </core>
         </helpers>
     </global>
+    <default>
+        <system>
+            <media_storage_configuration>
+                <loaded_modules>
+                    <Thai_S3 />
+                </loaded_modules>
+            </media_storage_configuration>
+        </system>
+    </default>
 </config>

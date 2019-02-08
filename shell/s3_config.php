@@ -36,6 +36,20 @@ class Thai_S3_Shell_Config extends Mage_Shell_Abstract
 
     public function run()
     {
+        if ($this->getArg('test')) {
+            /** @var Thai_S3_Helper_Data $helper */
+            $helper = Mage::helper('thai_s3');
+            try {
+                if (!$helper->getClient()->doesBucketExist($helper->getBucket())) {
+                    throw new Exception("The configured S3 bucket does not exist.");
+                }
+                echo "The configuration is valid.\n";
+                exit(0);
+            } catch (Exception $e) {
+                echo "ERROR: {$e->getMessage()}\n";
+                exit(1);
+            }
+        }
         if (empty($this->getArg('list'))) {
             $updatedCredentials = false;
             if (!empty($this->getArg('access-key-id'))) {
@@ -99,6 +113,7 @@ class Thai_S3_Shell_Config extends Mage_Shell_Abstract
 
 \033[1mSYNOPSIS\033[0m
     php s3_config.php [--list]
+                      [--test]
                       [--access-key-id <access-key-id>]
                       [--secret-key <secret-key>]
                       [--bucket <bucket>]
@@ -109,6 +124,11 @@ class Thai_S3_Shell_Config extends Mage_Shell_Abstract
 \033[1mOPTIONS\033[0m
     --list
         Lists whatever credentials for S3 you have provided for Magento.
+
+        \033[1mNOTE:\033[0m Using this option will cause the script to ignore the other options.
+
+    --test
+        Test the credentials provided and confirm that the bucket exists.
 
         \033[1mNOTE:\033[0m Using this option will cause the script to ignore the other options.
 

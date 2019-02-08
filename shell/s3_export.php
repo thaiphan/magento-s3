@@ -1,5 +1,6 @@
 <?php
 require_once './abstract.php';
+require_once '../app/Mage.php';
 
 class Thai_S3_Shell_Export extends Mage_Shell_Abstract
 {
@@ -21,8 +22,12 @@ class Thai_S3_Shell_Export extends Mage_Shell_Abstract
         if (is_null($helper->getRegion())) {
             $errors[] = 'You have not provided an S3 region. You can do so using our config script.';
         }
-        if (!$helper->getClient()->isBucketAvailable($helper->getBucket())) {
-            $errors[] = 'The AWS credentials you provided did not work. Please review your details and try again. You can do so using our config script.';
+        try {
+            if (!$helper->getClient()->doesBucketExist($helper->getBucket())) {
+                $errors[] = 'The configured S3 bucket does not exist.';
+            }
+        } catch (Exception $e) {
+            $errors[] = $e->getMessage();
         }
 
         if (empty($errors)) {

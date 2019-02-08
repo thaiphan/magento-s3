@@ -16,6 +16,8 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
     protected function _construct()
     {
         $this->_init('thai_s3/core_file_storage_s3');
+
+        $this->init(); // added because $this->bucket was found to be set to null at runtime.
     }
 
     public function getIdFieldName()
@@ -26,7 +28,7 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
     public function init()
     {
         $this->bucket = $this->getHelper()->getBucket();
-        
+
         return $this;
     }
 
@@ -242,7 +244,7 @@ class Thai_S3_Model_Core_File_Storage_S3 extends Mage_Core_Model_File_Storage_Ab
     {
         $this->getClient()->copyObject([
             'Bucket' => $this->bucket,
-            'CopySource' => $this->getObjectKey($oldFilePath),
+            'CopySource' => $this->bucket . '/' .$this->getObjectKey($oldFilePath),
             'Key' => $this->getObjectKey($newFilePath),
         ] + $this->getMetadata($oldFilePath));
 
