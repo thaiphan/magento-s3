@@ -9,6 +9,10 @@ Thai's S3 extension for Magento allows retailers to upload their catalogue and W
 
 **Note:** This extension is only compatible with Magento 1. Please use [Thai's S3 Extension for Magento 2](https://github.com/thaiphan/magento2-s3) for integration with Magento 2.
 
+Digital Ocean
+--------
+Digital Ocean Spaces aims to be compatible with https://developers.digitalocean.com/documentation/spaces/#aws-s3-compatibility
+
 Benefits
 --------
 
@@ -32,9 +36,10 @@ The following assets are automatically saved to S3:
 
 Complex file syncing between multiple servers is now a thing of the past with this extension. All your servers will be able to share the one S3 bucket as the single source of media.
 
-### Easy integration with CloudFront CDN
+### Easy integration with CloudFlare CDN
 
 CloudFront CDN supports using S3 as an origin server so you can significantly reduce load on your servers.
+https://miketabor.com/how-to-host-a-static-website-using-aws-s3-and-Cloudflare/
 
 Installation
 ------------
