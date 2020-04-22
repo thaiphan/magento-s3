@@ -36,9 +36,9 @@ The following assets are automatically saved to S3:
 
 Complex file syncing between multiple servers is now a thing of the past with this extension. All your servers will be able to share the one S3 bucket as the single source of media.
 
-### Easy integration with CloudFlare CDN
+### Easy integration with CloudFlare and CloudFront CDN
 
-CloudFront CDN supports using S3 as an origin server so you can significantly reduce load on your servers.
+CloudFront and Cloudflare CDNs supports using S3 as an origin server so you can significantly reduce load on your servers.
 https://miketabor.com/how-to-host-a-static-website-using-aws-s3-and-Cloudflare/
 
 Installation
