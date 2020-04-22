@@ -85,7 +85,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <sort_order>70</sort_order>
-                            <comment>Don't include the http:// or https:// prefix.</comment>
+                            <comment>Don't forget to include the http:// or https:// prefix.</comment>
                         </custom_endpoint>
                         <custom_headers>
                             <label>Custom Headers</label>
