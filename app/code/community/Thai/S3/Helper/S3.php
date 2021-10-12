@@ -63,6 +63,26 @@ class Thai_S3_Helper_S3
             [
                 'value' => 'sa-east-1',
                 'label' => 'South America (Sao Paulo)'
+            ],
+            [
+                'value' => 'nyc3',
+                'label' => 'DigitalOcean Spaces - New York 3'
+            ],
+            [
+                'value' => 'sfo3',
+                'label' => 'DigitalOcean Spaces - San Francisco 3'
+            ],
+            [
+                'value' => 'ams3',
+                'label' => 'DigitalOcean Spaces - Amsterdam 3'
+            ],
+            [
+                'value' => 'sgp1',
+                'label' => 'DigitalOcean Spaces - Singapore 1'
+            ],
+            [
+                'value' => 'fra1',
+                'label' => 'DigitalOcean Spaces - Frankfurt 1'
             ]
         ];
     }
