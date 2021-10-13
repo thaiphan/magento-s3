@@ -91,6 +91,12 @@ class Thai_S3_Shell_Export extends Mage_Shell_Abstract
 
 USAGE;
     }
+
+    protected function _applyPhpVariables()
+    {
+        // This is a long running script so it should not apply .htaccess php_value settings
+        // like memory_limit, max_execution_time, etc...
+    }
 }
 
 $shell = new Thai_S3_Shell_Export();
